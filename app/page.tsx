@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { usePdfControls } from '../components/PdfControlsProvider'
+import { t } from '../lib/i18n'
+import { useLanguage } from '../components/LanguageProvider'
 import { FormData } from '../types/form'
 import { Dialog } from '../components/ui/Dialog'
 
@@ -24,6 +26,7 @@ export default function Page() {
   const [mounted, setMounted] = useState<boolean>(false)
   const [currentLine, setCurrentLine] = useState<string>('')
   const [loading, setLoading] = useState<string | null>(null)
+  const { lang } = useLanguage()
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
   const [saveDialogMessage, setSaveDialogMessage] = useState<string | null>(null)
   
@@ -59,12 +62,12 @@ export default function Page() {
       localStorage.setItem('pdfForm', JSON.stringify(toSave))
       await wait(850)
       try {
-        setSaveDialogMessage('임시 저장이 완료되었습니다.')
+        setSaveDialogMessage(t(lang, 'save_success'));
         setSaveDialogOpen(true)
       } catch {}
     } catch (e) {
       try {
-        setSaveDialogMessage('임시 저장에 실패했습니다.')
+        setSaveDialogMessage(t(lang, 'save_failed'));
         setSaveDialogOpen(true)
       } catch {}
     } finally {
@@ -83,7 +86,7 @@ export default function Page() {
       await wait(700)
     } catch (err) {
       console.error('Error in onReset:', err)
-      try { alert('초기화 처리 중 오류가 발생했습니다: ' + (err instanceof Error ? err.message : String(err))) } catch {}
+  try { alert(t(lang, 'reset_error') + (err instanceof Error ? err.message : String(err))) } catch {}
       throw err
     } finally {
       setLoading(null)
@@ -226,11 +229,11 @@ export default function Page() {
       clearTimers()
       removeHint()
 
-      const el = document.createElement('div')
+    const el = document.createElement('div')
       el.id = 'scroll-hint'
       el.className = 'scroll-hint'
       el.setAttribute('aria-hidden', 'true')
-      el.innerHTML = `<span class="scroll-hint-emoji">👉</span><span class="scroll-hint-text">오른쪽으로 스크롤</span>`
+    el.innerHTML = `<span class="scroll-hint-emoji">👉</span><span class="scroll-hint-text">${t(lang, 'scroll_hint_text')}</span>`
       document.body.appendChild(el)
 
       // flash sequence: visible for ~2000ms then hidden briefly (blink) before next show
@@ -295,10 +298,10 @@ export default function Page() {
   return (
     <>
       {/* Save confirmation dialog (replaces alert) */}
-      <Dialog open={saveDialogOpen} onOpenChange={(v) => setSaveDialogOpen(v)} title="임시 저장">
+      <Dialog open={saveDialogOpen} onOpenChange={(v) => setSaveDialogOpen(v)} title={t(lang, 'save')}>
         <p className='text-sm text-gray-700'>{saveDialogMessage}</p>
         <div className='mt-4 flex justify-end'>
-          <button className='inline-flex items-center rounded-md bg-slate-900 px-3 py-1.5 text-sm text-white' onClick={() => setSaveDialogOpen(false)}>확인</button>
+          <button className='inline-flex items-center rounded-md bg-slate-900 px-3 py-1.5 text-sm text-white' onClick={() => setSaveDialogOpen(false)}>{t(lang, 'confirm')}</button>
         </div>
       </Dialog>
       {/* loading overlay shown when saving or resetting to simulate real network/processing */}
@@ -307,8 +310,8 @@ export default function Page() {
           <div className="loading-card">
             <div className="loading-spinner" aria-hidden="true" />
             <div>
-              <div className="loading-text">{loading === 'saving' ? '임시 저장 중...' : '초기화 중...'}</div>
-              <span className="loading-sub">잠시만 기다려 주세요.</span>
+              <div className="loading-text">{loading === 'saving' ? t(lang, 'saving_in_progress') : t(lang, 'resetting_in_progress')}</div>
+              <span className="loading-sub">{t(lang, 'loading_wait')}</span>
             </div>
           </div>
         </div>

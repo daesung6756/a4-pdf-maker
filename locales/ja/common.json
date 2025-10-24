@@ -1,0 +1,41 @@
+{
+  "app_title": "A4 PDFメーカー",
+  "pdf_download": "PDF をダウンロード",
+  "save": "一時保存",
+  "reset": "リセット",
+  "confirm_reset_title": "すべての内容をリセットしますか？",
+  "confirm_reset_description": "リセットするとローカルに保存された一時データが削除されます。続行しますか？",
+  "cancel": "キャンセル",
+  "reset_confirm": "リセット",
+
+  "preview": "プレビュー",
+  "pages": "ページ",
+  "content_placeholder": "内容を入力してください",
+  "editor_show": "エディタを表示",
+  "editor_hide": "エディタを非表示",
+  "font_label": "フォント:",
+  "size_label": "サイズ:",
+  "editor_initializing": "エディタ初期化中...",
+  "saving_in_progress": "一時保存中...",
+  "resetting_in_progress": "リセット中...",
+  "loading_wait": "しばらくお待ちください。",
+  "scroll_hint_text": "右にスクロール",
+  "save_success": "一時保存が完了しました。",
+  "save_failed": "一時保存に失敗しました。",
+  "reset_error": "リセット中にエラーが発生しました: ",
+
+  "editor_label": "エディタ",
+  "confirm": "確認",
+
+  "error_occurred": "エラーが発生しました",
+  "error_try_again": "もう一度試してください。問題が続く場合は開発者コンソールを確認してください。",
+  "retry": "再試行",
+
+  "not_found_title": "ページを見つけられません",
+  "not_found_description": "要求されたページが存在しないか、パスが間違っています。",
+
+  "default_option": "デフォルト",
+  "banner_area": "バナー領域",
+
+  "language_select": "言語を選択"
+}

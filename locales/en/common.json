@@ -1,0 +1,41 @@
+{
+  "app_title": "A4 PDF Maker",
+  "pdf_download": "Download PDF",
+  "save": "Save Draft",
+  "reset": "Reset",
+  "confirm_reset_title": "Reset all content?",
+  "confirm_reset_description": "Resetting will remove locally saved draft data. Do you want to continue?",
+  "cancel": "Cancel",
+  "reset_confirm": "Reset",
+
+  "preview": "Preview",
+  "pages": "pages",
+  "content_placeholder": "Please enter content",
+  "editor_show": "Show editor",
+  "editor_hide": "Hide editor",
+  "font_label": "Font:",
+  "size_label": "Size:",
+  "editor_initializing": "Initializing editor...",
+  "saving_in_progress": "Saving draft...",
+  "resetting_in_progress": "Resetting...",
+  "loading_wait": "Please wait a moment.",
+  "scroll_hint_text": "Scroll to the right",
+  "save_success": "Draft saved successfully.",
+  "save_failed": "Failed to save draft.",
+  "reset_error": "An error occurred while resetting: ",
+
+  "editor_label": "Editor",
+  "confirm": "OK",
+
+  "error_occurred": "An error occurred",
+  "error_try_again": "Please try again. If the problem persists, check the developer console.",
+  "retry": "Try again",
+
+  "not_found_title": "Page not found",
+  "not_found_description": "The page you requested does not exist or the path is incorrect.",
+
+  "default_option": "Default",
+  "banner_area": "Banner area",
+
+  "language_select": "Select language"
+}

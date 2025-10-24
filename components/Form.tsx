@@ -1,6 +1,8 @@
 ﻿ 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
+import { useLanguage } from './LanguageProvider'
+import { t } from '../lib/i18n'
 import { UseFormReturn } from 'react-hook-form'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
@@ -343,6 +345,7 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
   })
 
   const [collapsed, setCollapsed] = useState(false)
+  const { lang } = useLanguage()
   // use reusable hook for breakpoint tracking
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const useIsDesktop = require('../hooks/useIsDesktop').default as (bp?: number) => boolean
@@ -352,18 +355,18 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
     <div className={`layout-full ${collapsed ? 'collapsed' : ''}`}>
       <div className='preview-full'>
         <div>
-          <h2 className='text-lg font-semibold mb-2'>미리보기 (A4) - {pages} 페이지</h2>
+          <h2 className='text-lg font-semibold mb-2'>{t(lang, 'preview')} (A4) - {pages} {t(lang, 'pages')}</h2>
           <div className='space-y-4' ref={templateRef} id='pdf-template'>
             {pagesHtml.length > 0 ? pagesHtml.map((html, index) => (
               <div key={index} className='pdf-preview border' suppressHydrationWarning>
                 <div className='p-8'>
-                  <div className="ql-container ql-editor" dangerouslySetInnerHTML={{ __html: html || (index === 0 ? '내용을 입력하세요' : '') }} style={{ minHeight: '200px', padding: 0, border: 'none' }} />
+                  <div className="ql-container ql-editor" dangerouslySetInnerHTML={{ __html: html || (index === 0 ? t(lang, 'content_placeholder') : '') }} style={{ minHeight: '200px', padding: 0, border: 'none' }} />
                 </div>
               </div>
             )) : (
               <div className='pdf-preview border' suppressHydrationWarning>
                 <div className='p-8'>
-                  <div className="ql-container ql-editor" style={{}}>내용을 입력하세요</div>
+                  <div className="ql-container ql-editor" style={{}}>{t(lang, 'content_placeholder')}</div>
                 </div>
               </div>
             )}
@@ -373,30 +376,30 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
 
       {/* toggle button: always render across all widths */}
       <button aria-label='Toggle editor' onClick={() => setCollapsed(!collapsed)} className='editor-toggle'>
-        {collapsed ? '에디터 보기' : '에디터 숨기기'}
+        {collapsed ? t(lang, 'editor_show') : t(lang, 'editor_hide')}
       </button>
 
       <div className='form-fixed'>
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center gap-4'>
-            <strong>에디터</strong>
+            <strong>{t(lang, 'editor_label')}</strong>
             {/* columns selector removed per design decision */}
           </div>
         </div>
 
         <form id='main-form' onSubmit={handleSubmit(onPdfSubmit)} className='space-y-4'>
           <div className='mb-2 flex items-center gap-3'>
-            <label className='text-sm'>글꼴:</label>
+            <label className='text-sm'>{t(lang, 'font_label')}</label>
             <select value={selectedFont} onChange={onFontChange} className='border rounded px-2 py-1 text-sm'>
               {FONT_OPTIONS.map(opt => (
-                <option key={opt.key} value={opt.key}>{opt.label}</option>
+                <option key={opt.key} value={opt.key}>{opt.key === '' ? t(lang, 'default_option') : opt.label}</option>
               ))}
             </select>
 
-            <label className='text-sm'>크기:</label>
+            <label className='text-sm'>{t(lang, 'size_label')}</label>
             <select value={selectedSize} onChange={onSizeChange} className='border rounded px-2 py-1 text-sm'>
               {SIZE_OPTIONS.map(opt => (
-                <option key={opt.key} value={opt.key}>{opt.label}</option>
+                <option key={opt.key} value={opt.key}>{opt.key === '' ? t(lang, 'default_option') : opt.label}</option>
               ))}
             </select>
           </div>
@@ -415,7 +418,7 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
                 ]}
               />
             ) : (
-              <div className='border p-4 text-sm text-gray-500'>에디터 초기화 중...</div>
+              <div className='border p-4 text-sm text-gray-500'>{t(lang, 'editor_initializing')}</div>
             )}
           </div>
         </form>
@@ -425,14 +428,14 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
           <div className='ad-banner w-full bg-gray-100 border border-dashed rounded-lg flex items-center justify-center h-28 text-gray-700'>
             <div className='text-center'>
               <div className='text-lg font-semibold'>728×90</div>
-              <div className='text-sm'>배너 영역</div>
+              <div className='text-sm'>{t(lang, 'banner_area')}</div>
             </div>
           </div>
 
           <div className='ad-banner w-full bg-gray-100 border border-dashed rounded-lg flex items-center justify-center h-28 text-gray-700'>
             <div className='text-center'>
               <div className='text-lg font-semibold'>728×90</div>
-              <div className='text-sm'>배너 영역</div>
+              <div className='text-sm'>{t(lang, 'banner_area')}</div>
             </div>
           </div>
         </div>

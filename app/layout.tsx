@@ -2,6 +2,7 @@ import './globals.css'
 import Header from '../components/layout/Header'
 import Footer from '../components/layout/Footer'
 import PdfControlsProvider from '../components/PdfControlsProvider'
+import LanguageProvider from '../components/LanguageProvider'
 
 export const metadata = {
   title: 'PDF Microsite',
@@ -22,9 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
     <body>
       <PdfControlsProvider>
-        <Header />
-        {children}
-        <Footer />
+        <LanguageProvider>
+          <Header />
+          {children}
+          <Footer />
+        </LanguageProvider>
       </PdfControlsProvider>
     </body>
     </html>
