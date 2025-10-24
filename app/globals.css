@@ -1,0 +1,465 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ Style-writing conventions (for contributors and automated edits)
+ - Namespace classes by purpose: layout-*, ui-*, util-* to avoid collisions.
+ - Prefer short, semantic names (e.g., .main-scroll-indicator) and keep BEM-like structure for complex components.
+ - Use transition durations around 160-320ms for UI motions to match app rhythm.
+ - Prefer `rem`/`em` for font sizes in component styles; pixels allowed for precise sprite sizes.
+ - Accessibility: if an element is purely decorative/visual, add `aria-hidden="true"` and avoid announcing via JS unless necessary.
+ - Mobile breakpoints: keep primary mobile cutoff at 768px unless explicitly overridden.
+ - When adding animations, ensure `prefers-reduced-motion` is respected in a future PR.
+ - Document new global classes in this header comment block.
+ - 미디어쿼리를 사용하지 않는 스타일의 경우 현재 가장 먼저 시작되는 미디어쿼리 위쪽에 작성한다.
+ - 미디어쿼리를 추가 할 경우 미디어 쿼리 가로 길이가 높은 순서대로 작성하며, 순서대로 배치한다.
+ - 미디어쿼리를 추가 할 경우 동일한 미디어쿼리 가로 길이가 존재하면 그 내부에 작성한다.
+*/
+
+html, body { height: 100%; }
+body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+
+.ql-editor p {
+  margin: 1em 0;
+}
+
+.ql-editor strong, .ql-editor b {
+  font-weight: bold;
+}
+
+.ql-editor em, .ql-editor i {
+  font-style: italic;
+}
+
+.ql-editor u {
+  text-decoration: underline;
+}
+
+.ql-editor s {
+  text-decoration: line-through;
+}
+
+.ql-editor ol, .ql-editor ul {
+  padding-left: 1.5em;
+}
+
+.ql-editor ol li, .ql-editor ul li {
+  margin: 0.5em 0;
+}
+
+/* React Quill size styles for preview */
+.ql-size-small {
+  font-size: 12px !important;
+}
+
+.ql-size-normal {
+  font-size: 16px !important;
+}
+
+.ql-size-large {
+  font-size: 20px !important;
+}
+
+.ql-size-huge {
+  font-size: 24px !important;
+}
+.ql-editor {
+  min-height: 400px;
+  max-height: calc(100vh - 212px);
+}
+
+/* Ensure the content editor fills the available space */
+.pdf-preview .ql-editor {
+  height: 100%;
+  min-height: auto;
+  max-height: none;
+}
+
+.form-fixed .ql-editor {
+  min-height: 300px;
+  max-height: calc(100vh - 600px);
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+/* Highlight selected text in preview */
+.pdf-preview mark {
+  background-color: yellow;
+  padding: 2px;
+}
+
+/* Highlight a block in the preview corresponding to editor selection */
+.preview-highlight {
+  background: rgba(255, 240, 100, 0.35);
+  transition: background 160ms ease-in-out;
+}
+
+/* Full viewport preview with fixed form on the right for desktop */
+.layout-full {
+  display:grid;
+  gap: 0;
+  /* desktop fixed header height */
+  padding-top: 65px;
+  grid-template-columns: 1fr 700px; 
+  transition: grid-template-columns 320ms cubic-bezier(.2,.9,.2,1);
+}
+
+.preview-full {
+  width: 100%;
+  /* Fill the viewport height so the left column occupies the full area */
+  background: #f8fafc;
+  display: flex;
+  justify-content: center; /* center preview horizontally */
+  align-items: flex-start; /* align top so the preview aligns with the top of the area */
+  padding:40px 20px;
+}
+
+.form-fixed {
+  position:fixed;
+  right:0;
+  top: 65px;
+  width: 700px;
+  min-width: 700px;
+  height:calc(100vh - 64px);
+  background: white;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.06);
+  padding: 16px;
+  border-left: 1px solid #e5e7eb; /* visual separator */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: transform 320ms cubic-bezier(.2,.9,.2,1), opacity 220ms ease, box-shadow 200ms ease;
+}
+
+.editor-toggle {
+  position: fixed;
+  right: 10px;
+  top:100px;
+  z-index: 60;
+  background: #ddd;
+  color: #222;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 3px rgba(0,0,0,0.15);
+  font-size: 14px;
+  transition: background 200ms ease, transform 320ms cubic-bezier(.2,.9,.2,1);
+}
+.editor-toggle:hover {
+  background: #fff;
+  transition: background 200ms ease;
+}
+
+.pdf-preview {
+  box-shadow: 0 0 0 1px #e5e7eb;
+  background: white;
+  /* Keep print sizing in mm, but make on-screen responsive */
+  width: min(210mm, 100%);
+  max-width: 210mm;
+  min-width: 210mm;
+  min-height: 297mm; /* maintain minimum A4 height */
+  height: auto; /* allow height to expand based on content */
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner content container that fills the remaining space */
+.pdf-preview > .p-8 {
+  flex: 1; /* fill the remaining height excluding padding */
+  /* Fallback: allow scrolling if content larger than container */
+  overflow: auto;
+}
+
+.preview-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 8px;
+  overflow: auto;
+}
+
+.layout-full.collapsed {
+  grid-template-columns: 1fr 0px;
+  transition: grid-template-columns 320ms cubic-bezier(.2,.9,.2,1);
+}
+
+/* When collapsed on tablet, slide the panel out to the right (off-screen) using translateX */
+.layout-full.collapsed .form-fixed {
+  transform: translateX(110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+  cursor: pointer;
+}
+
+/* Footer styles */
+.footer-wrap {
+  position:relative;
+  border-top: 1px solid #e5e7eb;
+  padding-top:100px;
+}
+
+.app-footer {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  background: #0f172a; /* dark */
+  color: #e6eef8;
+  padding: 28px 12px;
+  z-index:90;
+}
+.app-footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.footer-left strong { font-size: 16px; }
+.muted { color: rgba(230,238,248,0.7); font-size: 13px; }
+.footer-right { text-align: right; font-size: 13px; }
+
+/* Loading overlay shown during save/reset actions to mimic network latency */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,6,23,0.35);
+  backdrop-filter: blur(2px);
+}
+
+.loading-card {
+  background: #fff;
+  padding: 18px 20px;
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.28);
+  min-width: 260px;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 4px solid rgba(15,23,42,0.08);
+  border-top-color: #06b6d4; /* cyan-400 */
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  font-weight: 600;
+  color: #0f172a;
+}
+.loading-sub {
+  display: block;
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Scroll hint shown on mobile when editor is hidden - centered, temporary */
+.scroll-hint {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99999;
+  background: rgba(255,255,255,0.95);
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.24);
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms cubic-bezier(.2,.9,.2,1);
+  font-weight: 700;
+  color: #0f172a;
+}
+.scroll-hint .scroll-hint-emoji { font-size: 22px; line-height: 1 }
+.scroll-hint .scroll-hint-text { font-size: 15px; }
+.scroll-hint.hint-visible {
+  opacity: 1;
+  transform: translate(-50%, -54%);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 829px) {
+  header.fixed {
+    box-shadow: 0 5px 5px #ddd;
+    z-index:100;
+  }
+
+.preview-full {
+  /* allow horizontal scroll but hide native scrollbars for a cleaner look */
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+.preview-full::-webkit-scrollbar {
+  height: 0; /* WebKit */
+}
+
+/* The track sits at the top of the main area; outer container is sticky so it stays visible */
+.main-scroll-progress {
+  position: sticky;
+  top: 65px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: rgba(2,6,23,0.04); /* subtle track */
+  z-index: 60;
+  display: block;
+  pointer-events: none;
+  z-index: 100;
+}
+.main-scroll-progress .bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6ee7b7 0%, #60a5fa 100%); /* soft mint -> sky blue */
+  box-shadow: 0 2px 8px rgba(96,165,250,0.08) inset;
+  transition: width 120ms linear, opacity 200ms ease;
+  opacity: 0.95;
+}
+
+/* When there's nothing to scroll, keep the bar collapsed (width:0). We will toggle visibility via JS. */
+.main-scroll-progress.hidden { opacity: 0; height: 6px }
+
+  .layout-full {
+    display: block;
+  }
+
+  .preview-full {
+    padding-left: 8px;
+    padding-right: 8px;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow:hidden;
+    overflow-x: auto;
+  }
+
+  .pdf-preview > .p-8 {
+    overflow: visible;
+  }
+
+  .form-fixed {
+    right: 0;
+    left:0;
+    top: auto;
+    bottom:0;
+    width: 100% !important;
+    min-width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    border-left: none;
+    padding: 12px;
+    margin-bottom: 0;
+    box-shadow: 0 2px 32px #666;
+    z-index:100;
+  }
+
+  .editor-toggle {
+   z-index:101;
+  }
+
+  .form-fixed .ql-editor {
+    min-height: 140px;
+    max-height: 200px;
+    overflow: hidden;
+    overflow-y: auto;
+  }
+
+  .form-fixed .mb-2 {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .editor-toggle {
+    top: auto;
+    bottom:10px;
+    
+  }
+
+  .form-fixed label { font-size: 13px; }
+
+  .form-fixed select, .form-fixed button {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  /* Reduce editor toolbar/minor text sizes for mobile */
+  .ql-container.ql-snow { font-size: 14px; }
+
+  .layout-full.collapsed .form-fixed {
+    transform: translateY(110%);    
+  }
+
+}
+
+/* Very small screens: stack header title above action buttons at <=531px */
+@media (max-width: 530px) {
+  header.fixed {
+    flex-direction: column;
+    align-items: center;
+    height: 64px;
+    padding:10px;
+    gap: 8px;
+    box-sizing: border-box;
+  }
+
+  header.fixed h1 {
+    display:none;
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1;
+    padding: 10px 0 0 0;
+  }
+
+  /* button group becomes a full-width row on its own line, right-aligned */
+  header.fixed > .flex {
+    width: 100%;
+    height:100%;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* make action buttons slightly smaller to fit */
+  header.fixed > .flex button {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+/* Reduce height for very small screens */
+@media (max-width: 420px) {
+  .main-scroll-progress { height: 6px }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+
+
