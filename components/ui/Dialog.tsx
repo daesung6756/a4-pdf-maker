@@ -48,7 +48,7 @@ export function Dialog({ open = false, onOpenChange, title, description, childre
   if (!open) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center">
       <div
         className="fixed inset-0 bg-black/40"
         onMouseDown={(e) => {

@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { usePdfControls } from '../components/PdfControlsProvider'
 import { FormData } from '../types/form'
+import { Dialog } from '../components/ui/Dialog'
 
 // Load Form as a client-only component to avoid server-side evaluation of DOM APIs
 const Form = dynamic(() => import('../components/Form'), { ssr: false })
@@ -23,6 +24,8 @@ export default function Page() {
   const [mounted, setMounted] = useState<boolean>(false)
   const [currentLine, setCurrentLine] = useState<string>('')
   const [loading, setLoading] = useState<string | null>(null)
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false)
+  const [saveDialogMessage, setSaveDialogMessage] = useState<string | null>(null)
   
 
   useEffect(() => {
@@ -55,9 +58,15 @@ export default function Page() {
       const toSave = { content: editorContent }
       localStorage.setItem('pdfForm', JSON.stringify(toSave))
       await wait(850)
-      try { alert('임시 저장 완료') } catch {}
+      try {
+        setSaveDialogMessage('임시 저장이 완료되었습니다.')
+        setSaveDialogOpen(true)
+      } catch {}
     } catch (e) {
-      try { alert('임시 저장 실패') } catch {}
+      try {
+        setSaveDialogMessage('임시 저장에 실패했습니다.')
+        setSaveDialogOpen(true)
+      } catch {}
     } finally {
       setLoading(null)
     }
@@ -224,14 +233,15 @@ export default function Page() {
       el.innerHTML = `<span class="scroll-hint-emoji">👉</span><span class="scroll-hint-text">오른쪽으로 스크롤</span>`
       document.body.appendChild(el)
 
-      // flash sequence: visible for ~300ms then hidden for remaining to make ~1s interval
+      // flash sequence: visible for ~2000ms then hidden briefly (blink) before next show
       let i = 0
       const doFlash = () => {
         if (!el.parentNode) return
         // show
         el.classList.add('hint-visible')
+        // keep visible for ~2000ms
         timers.push(window.setTimeout(() => {
-          // hide after 300ms
+          // hide briefly to create a blink effect
           el.classList.remove('hint-visible')
           i += 1
           if (i >= count) {
@@ -241,11 +251,11 @@ export default function Page() {
             }, 300))
             return
           }
-          // wait 700ms then do next flash (total ~1000ms per cycle)
+          // short hidden gap (~300ms) before next show
           timers.push(window.setTimeout(() => {
             doFlash()
-          }, 700))
-        }, 300))
+          }, 300))
+        }, 2000))
       }
 
       // small delay before starting to allow UI state to settle
@@ -264,7 +274,11 @@ export default function Page() {
         const layout = document.querySelector('.layout-full')
         const collapsed = layout ? layout.classList.contains('collapsed') : false
         if (collapsed) {
-          showHint(3)
+          showHint(1)
+        } else {
+          // if the toggle made the editor visible again, stop any active hint sequences
+          clearTimers()
+          removeHint()
         }
       }, 120))
     }
@@ -280,6 +294,13 @@ export default function Page() {
 
   return (
     <>
+      {/* Save confirmation dialog (replaces alert) */}
+      <Dialog open={saveDialogOpen} onOpenChange={(v) => setSaveDialogOpen(v)} title="임시 저장">
+        <p className='text-sm text-gray-700'>{saveDialogMessage}</p>
+        <div className='mt-4 flex justify-end'>
+          <button className='inline-flex items-center rounded-md bg-slate-900 px-3 py-1.5 text-sm text-white' onClick={() => setSaveDialogOpen(false)}>확인</button>
+        </div>
+      </Dialog>
       {/* loading overlay shown when saving or resetting to simulate real network/processing */}
       {loading && (
         <div className="loading-overlay" role="status" aria-live="polite">

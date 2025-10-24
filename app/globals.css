@@ -311,39 +311,37 @@ button,
     z-index:100;
   }
 
-.preview-full {
-  /* allow horizontal scroll but hide native scrollbars for a cleaner look */
-  overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-}
-.preview-full::-webkit-scrollbar {
-  height: 0; /* WebKit */
-}
+  .preview-full {
+    /* allow horizontal scroll but hide native scrollbars for a cleaner look */
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+  .preview-full::-webkit-scrollbar {
+    height: 0; /* WebKit */
+  }
 
-/* The track sits at the top of the main area; outer container is sticky so it stays visible */
-.main-scroll-progress {
-  position: sticky;
-  top: 65px;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: rgba(2,6,23,0.04); /* subtle track */
-  z-index: 60;
-  display: block;
-  pointer-events: none;
-  z-index: 100;
-}
-.main-scroll-progress .bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #6ee7b7 0%, #60a5fa 100%); /* soft mint -> sky blue */
-  box-shadow: 0 2px 8px rgba(96,165,250,0.08) inset;
-  transition: width 120ms linear, opacity 200ms ease;
-  opacity: 0.95;
-}
-
-/* When there's nothing to scroll, keep the bar collapsed (width:0). We will toggle visibility via JS. */
-.main-scroll-progress.hidden { opacity: 0; height: 6px }
+  /* The track sits at the top of the main area; outer container is sticky so it stays visible */
+  .main-scroll-progress {
+    position: sticky;
+    top: 65px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: rgba(2,6,23,0.04); /* subtle track */
+    z-index: 60;
+    display: block;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .main-scroll-progress .bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6ee7b7 0%, #60a5fa 100%); /* soft mint -> sky blue */
+    box-shadow: 0 2px 8px rgba(96,165,250,0.08) inset;
+    transition: width 120ms linear, opacity 200ms ease;
+    opacity: 0.95;
+  }
+  .main-scroll-progress.hidden { opacity: 0; height: 6px }
 
   .layout-full {
     display: block;
@@ -449,8 +447,18 @@ button,
     padding: 8px 10px;
     font-size: 13px;
   }
-}
 
+  .add-banner-wrap {
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    gap:10px;
+  }
+
+   .add-banner-wrap > div + div {
+    margin:0 !important;
+  }
+}
 /* Reduce height for very small screens */
 @media (max-width: 420px) {
   .main-scroll-progress { height: 6px }
