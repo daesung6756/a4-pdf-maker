@@ -228,22 +228,7 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
           </div>
         </form>
 
-        {/* 광고 배너 영역: #main-form 바로 아래에 배너 2개(가상의 이미지) 삽입 */}
-        <div id='ad-area' className='add-banner-wrap mt-4 space-y-4'>
-          <div className='ad-banner w-full bg-gray-100 border border-dashed rounded-lg flex items-center justify-center h-28 text-gray-700'>
-            <div className='text-center'>
-              <div className='text-lg font-semibold'>728×90</div>
-              <div className='text-sm'>{t(lang, 'banner_area')}</div>
-            </div>
-          </div>
-
-          <div className='ad-banner w-full bg-gray-100 border border-dashed rounded-lg flex items-center justify-center h-28 text-gray-700'>
-            <div className='text-center'>
-              <div className='text-lg font-semibold'>728×90</div>
-              <div className='text-sm'>{t(lang, 'banner_area')}</div>
-            </div>
-          </div>
-        </div>
+        {/* 광고 배너 영역 제거됨 */}
       </div>
     </div>
   )

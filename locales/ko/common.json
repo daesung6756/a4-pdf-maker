@@ -35,7 +35,6 @@
   "not_found_description": "요청하신 페이지가 존재하지 않거나 경로가 잘못되었습니다.",
 
   "default_option": "기본",
-  "banner_area": "배너 영역",
 
   "language_select": "언어 선택"
 }

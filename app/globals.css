@@ -504,16 +504,7 @@ button,
     font-size: 13px;
   }
 
-  .add-banner-wrap {
-    display:flex;
-    align-items: center;
-    justify-content: space-between;
-    gap:10px;
-  }
-
-   .add-banner-wrap > div + div {
-    margin:0 !important;
-  }
+  /* banner styles removed */
 }
 /* Reduce height for very small screens */
 @media (max-width: 420px) {
