@@ -8,6 +8,9 @@ import jsPDF from 'jspdf'
 import { usePdfControls } from '../components/PdfControlsProvider'
 import { t } from '../lib/i18n'
 import { useLanguage } from '../components/LanguageProvider'
+import PageDialogs from '../components/PageDialogs'
+import ScrollProgress from '../components/ScrollProgress'
+import MobileScrollHint from '../components/MobileScrollHint'
 import { FormData } from '../types/form'
 import { Dialog } from '../components/ui/Dialog'
 
@@ -161,165 +164,26 @@ export default function Page() {
   // Register handlers with provider (after functions are declared)
   const { registerHandlers } = usePdfControls()
   useEffect(() => {
-    // register handlers with provider
     registerHandlers({ onSave, onReset, onPdfSubmit })
     return () => {
-      // reset to noops when unmounting
       registerHandlers({ onSave: () => {}, onReset: () => {}, onPdfSubmit: async () => {} })
-      // cleanup done
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSave, onReset, onPdfSubmit])
 
-  // Custom top progress bar for horizontal scrolling of the preview area
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return
-    const pf = document.querySelector('.preview-full') as HTMLElement | null
-    const container = document.querySelector('.main-scroll-progress') as HTMLElement | null
-    const bar = container?.querySelector('.bar') as HTMLElement | null
-    if (!pf || !container || !bar) return
+  // Top progress bar is handled by ScrollProgress component
 
-    const update = () => {
-      const max = pf.scrollWidth - pf.clientWidth
-      if (!max || max <= 2) {
-        container.classList.add('hidden')
-        bar.style.width = '0%'
-        return
-      }
-      container.classList.remove('hidden')
-      const ratio = pf.scrollLeft / max
-      bar.style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`
-    }
-
-    pf.addEventListener('scroll', update, { passive: true } as any)
-    window.addEventListener('resize', update)
-    // initial
-    update()
-
-    return () => {
-      try { pf.removeEventListener('scroll', update as EventListener) } catch (e) {}
-      try { window.removeEventListener('resize', update) } catch (e) {}
-    }
-  }, [pagesHtml])
-
-  // Mobile-only: when .editor-toggle is clicked and editor becomes hidden (collapsed),
-  // show a centered hint that prompts the user to scroll right. It will blink 3 times
-  // at ~1s intervals then auto-remove. Mobile threshold: <=768px.
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return
-
-    const mobileMatch = () => window.matchMedia('(max-width: 768px)').matches
-
-    let timers: number[] = []
-
-    const clearTimers = () => {
-      timers.forEach(t => clearTimeout(t))
-      timers = []
-    }
-
-    const removeHint = () => {
-      const existing = document.getElementById('scroll-hint')
-      if (existing && existing.parentNode) existing.parentNode.removeChild(existing)
-    }
-
-    const showHint = (count = 3) => {
-      // avoid showing on non-mobile
-      if (!mobileMatch()) return
-      // remove existing hint/timers if any
-      clearTimers()
-      removeHint()
-
-    const el = document.createElement('div')
-      el.id = 'scroll-hint'
-      el.className = 'scroll-hint'
-      el.setAttribute('aria-hidden', 'true')
-    el.innerHTML = `<span class="scroll-hint-emoji">👉</span><span class="scroll-hint-text">${t(lang, 'scroll_hint_text')}</span>`
-      document.body.appendChild(el)
-
-      // flash sequence: visible for ~2000ms then hidden briefly (blink) before next show
-      let i = 0
-      const doFlash = () => {
-        if (!el.parentNode) return
-        // show
-        el.classList.add('hint-visible')
-        // keep visible for ~2000ms
-        timers.push(window.setTimeout(() => {
-          // hide briefly to create a blink effect
-          el.classList.remove('hint-visible')
-          i += 1
-          if (i >= count) {
-            // final cleanup after short delay
-            timers.push(window.setTimeout(() => {
-              removeHint()
-            }, 300))
-            return
-          }
-          // short hidden gap (~300ms) before next show
-          timers.push(window.setTimeout(() => {
-            doFlash()
-          }, 300))
-        }, 2000))
-      }
-
-      // small delay before starting to allow UI state to settle
-      timers.push(window.setTimeout(() => doFlash(), 80))
-    }
-
-    const onDocClick = (ev: MouseEvent) => {
-      const target = ev.target as Element | null
-      if (!target) return
-      const toggle = target.closest && (target as Element).closest('.editor-toggle')
-      if (!toggle) return
-      // only run on mobile
-      if (!mobileMatch()) return
-      // check after a short delay to allow the layout class toggle animation to apply
-      timers.push(window.setTimeout(() => {
-        const layout = document.querySelector('.layout-full')
-        const collapsed = layout ? layout.classList.contains('collapsed') : false
-        if (collapsed) {
-          showHint(1)
-        } else {
-          // if the toggle made the editor visible again, stop any active hint sequences
-          clearTimers()
-          removeHint()
-        }
-      }, 120))
-    }
-
-    document.addEventListener('click', onDocClick)
-
-    return () => {
-      document.removeEventListener('click', onDocClick)
-      clearTimers()
-      removeHint()
-    }
-  }, [])
+  // Mobile hint handled by MobileScrollHint component
 
   return (
     <>
-      {/* Save confirmation dialog (replaces alert) */}
-      <Dialog open={saveDialogOpen} onOpenChange={(v) => setSaveDialogOpen(v)} title={t(lang, 'save')}>
-        <p className='text-sm text-gray-700'>{saveDialogMessage}</p>
-        <div className='mt-4 flex justify-end'>
-          <button className='inline-flex items-center rounded-md bg-slate-900 px-3 py-1.5 text-sm text-white' onClick={() => setSaveDialogOpen(false)}>{t(lang, 'confirm')}</button>
-        </div>
-      </Dialog>
-      {/* loading overlay shown when saving or resetting to simulate real network/processing */}
-      {loading && (
-        <div className="loading-overlay" role="status" aria-live="polite">
-          <div className="loading-card">
-            <div className="loading-spinner" aria-hidden="true" />
-            <div>
-              <div className="loading-text">{loading === 'saving' ? t(lang, 'saving_in_progress') : t(lang, 'resetting_in_progress')}</div>
-              <span className="loading-sub">{t(lang, 'loading_wait')}</span>
-            </div>
-          </div>
-        </div>
-      )}
+      <PageDialogs lang={lang} saveDialogOpen={saveDialogOpen} setSaveDialogOpen={setSaveDialogOpen} saveDialogMessage={saveDialogMessage} loading={loading} />
 
       <main className={`bg-gray-50 main`}>
         {/* custom top progress scrollbar for horizontal preview scroll */}
         <div className="main-scroll-progress hidden" aria-hidden="true"><div className="bar" /></div>
+        <ScrollProgress pagesHtml={pagesHtml} />
+        <MobileScrollHint lang={lang} />
         <div>
           <Form
             form={form}

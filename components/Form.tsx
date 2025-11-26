@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLanguage } from './LanguageProvider'
 import { t } from '../lib/i18n'
 import { UseFormReturn } from 'react-hook-form'
+// Editor.js removed in favor of TipTap
+import EditorTiptap from './EditorTiptap'
 
 import { FormData } from '../types/form'
 
@@ -171,6 +173,8 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
 
   const [collapsed, setCollapsed] = useState(false)
   const { lang } = useLanguage()
+  // TipTap editor (client-side)
+  
   // use reusable hook for breakpoint tracking
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const useIsDesktop = require('../hooks/useIsDesktop').default as (bp?: number) => boolean
@@ -218,12 +222,9 @@ const Form = ({ form, editorContent, setEditorContent, preview, setPreview, page
             </div>
 
           <div>
-            <textarea
-              value={editorContent}
-              onChange={(e) => handleEditorChange(e.target.value)}
-              className='w-full h-64 border rounded p-3 text-sm'
-              aria-label={t(lang, 'editor_label')}
-            />
+            <div>
+              <EditorTiptap initialContent={editorContent} onChange={handleEditorChange} />
+            </div>
           </div>
         </form>
 

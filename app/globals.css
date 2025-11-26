@@ -69,6 +69,48 @@ body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 
   max-height: calc(100vh - 212px);
 }
 
+/* Tables: ensure visible grid lines in both editor (ProseMirror / Quill preview) and PDF preview */
+.ProseMirror table, .ql-editor table, .pdf-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.ProseMirror th, .ql-editor th, .pdf-preview th,
+.ProseMirror td, .ql-editor td, .pdf-preview td {
+  border: 1px solid #d1d5db; /* gray-300 */
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+}
+.ProseMirror th, .ql-editor th, .pdf-preview th {
+  background: #f3f4f6; /* gray-100 */
+  font-weight: 600;
+}
+
+/* TipTap / ProseMirror editor sizing: ensure the editable area has a minimum
+   height so the input is not rendered as a single line. Mirrors existing
+   .ql-editor sizing rules used for the Quill-based preview/editor. */
+.ProseMirror {
+  min-height: 300px;
+  max-height: 400px;
+  overflow: auto;
+  padding: 8px;
+}
+
+/* Ensure editor content uses left-to-right direction and default left alignment
+   This prevents unexpected RTL/caret placement when browser or surrounding
+   elements inherit a different direction. It's intentionally scoped to the
+   editable area (ProseMirror / Quill) so it doesn't affect the rest of the app. */
+.ProseMirror, .ql-editor {
+  direction: ltr;
+  text-align: left;
+}
+
+.form-fixed .ProseMirror {
+  min-height: 300px;
+  max-height: calc(100vh - 600px);
+  overflow: auto;
+}
+
 /* Ensure the content editor fills the available space */
 .pdf-preview .ql-editor {
   height: 100%;
